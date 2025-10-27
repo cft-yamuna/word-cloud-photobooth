@@ -14,8 +14,11 @@ function StartScreen({ onStart }: StartScreenProps) {
         <h1 className="text-7xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           Word Cloud
         </h1>
-        <p className="text-gray-600 text-xl mb-12 max-w-md mx-auto">
-          Create beautiful word clouds with your own words
+        <p className="text-gray-600 text-xl mb-4 max-w-md mx-auto">
+          Create a portrait word cloud featuring Caterpillar's core values
+        </p>
+        <p className="text-sm text-gray-500 mb-12 max-w-lg mx-auto">
+          Your portrait will be formed using words like: Innovation, Leadership, Collaboration, Technology, and more
         </p>
         <button
           onClick={onStart}

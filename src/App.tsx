@@ -1,24 +1,25 @@
 import { useState } from 'react';
 import StartScreen from './components/StartScreen';
-import WordInputScreen from './components/WordInputScreen';
 import CameraScreen from './components/CameraScreen';
 import MaskingScreen from './components/MaskingScreen';
 import ResultScreen from './components/ResultScreen';
 
-type Screen = 'start' | 'input' | 'camera' | 'masking' | 'result';
+type Screen = 'start' | 'camera' | 'masking' | 'result';
+
+// Fixed list of words for the word cloud
+const FIXED_WORDS = [
+  'Caterpillar', 'People', 'Innovation', 'Values', 'Leaders',
+  'Technology', 'Stakeholders', 'Collaboration', 'Safety', 'Performance',
+  'Customer', 'Sustainable world', 'Centennial World tour', 'Progress',
+  'Next 100 years', 'Strong', 'Authentic', 'Respectful'
+];
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('start');
-  const [words, setWords] = useState<string[]>([]);
   const [cameraPhoto, setCameraPhoto] = useState<string>('');
   const [threshold, setThreshold] = useState<number>(128);
 
   const handleStart = () => {
-    setCurrentScreen('input');
-  };
-
-  const handleWordsComplete = (submittedWords: string[]) => {
-    setWords(submittedWords);
     setCurrentScreen('camera');
   };
 
@@ -33,7 +34,6 @@ function App() {
   };
 
   const handleHome = () => {
-    setWords([]);
     setCameraPhoto('');
     setThreshold(128);
     setCurrentScreen('start');
@@ -42,18 +42,17 @@ function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {currentScreen === 'start' && <StartScreen onStart={handleStart} />}
-      {currentScreen === 'input' && <WordInputScreen onNext={handleWordsComplete} />}
       {currentScreen === 'camera' && <CameraScreen onCapture={handlePhotoCapture} />}
       {currentScreen === 'masking' && (
         <MaskingScreen
           cameraPhoto={cameraPhoto}
-          words={words}
+          words={FIXED_WORDS}
           onNext={handleMaskingComplete}
         />
       )}
       {currentScreen === 'result' && (
         <ResultScreen
-          words={words}
+          words={FIXED_WORDS}
           cameraPhoto={cameraPhoto}
           threshold={threshold}
           onHome={handleHome}

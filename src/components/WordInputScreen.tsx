@@ -10,14 +10,14 @@ function WordInputScreen({ onNext }: WordInputScreenProps) {
   const [currentWord, setCurrentWord] = useState('');
 
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && currentWord.trim() && words.length < 20) {
+    if (e.key === 'Enter' && currentWord.trim() && words.length < 50) {
       setWords([...words, currentWord.trim()]);
       setCurrentWord('');
     }
   };
 
   const handleAddWord = () => {
-    if (currentWord.trim() && words.length < 20) {
+    if (currentWord.trim() && words.length < 50) {
       setWords([...words, currentWord.trim()]);
       setCurrentWord('');
     }
@@ -62,7 +62,7 @@ function WordInputScreen({ onNext }: WordInputScreenProps) {
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2 text-center">
-              Words ({words.length}/20)
+              Words ({words.length}/50)
             </label>
             <div className="flex gap-2 items-center max-w-2xl mx-auto">
               <input
@@ -71,19 +71,19 @@ function WordInputScreen({ onNext }: WordInputScreenProps) {
                 onChange={(e) => setCurrentWord(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Type a word and press Enter"
-                disabled={words.length >= 20}
+                disabled={words.length >= 50}
                 className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg disabled:bg-gray-100"
               />
               <button
                 onClick={handleAddWord}
-                disabled={!currentWord.trim() || words.length >= 20}
+                disabled={!currentWord.trim() || words.length >= 50}
                 className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 <Plus className="w-5 h-5" />
               </button>
             </div>
-            {words.length >= 20 && (
-              <p className="text-sm text-red-500 mt-2 text-center">Maximum 20 words reached</p>
+            {words.length >= 50 && (
+              <p className="text-sm text-red-500 mt-2 text-center">Maximum 50 words reached</p>
             )}
           </div>
 

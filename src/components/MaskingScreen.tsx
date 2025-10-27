@@ -71,6 +71,14 @@ function MaskingScreen({ cameraPhoto, words, onNext }: MaskingScreenProps) {
         </h2>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
+          {/* Display the words that will be used */}
+          <div className="mb-4 p-4 bg-blue-50 rounded-lg">
+            <p className="text-sm font-semibold text-gray-700 mb-2">Words that will be used:</p>
+            <p className="text-xs text-gray-600 leading-relaxed">
+              {words.join(' • ')}
+            </p>
+          </div>
+
           {/* Mask Preview - Centered */}
           <div className="flex items-center justify-center bg-gray-50 rounded-xl p-6 mb-6">
             <canvas

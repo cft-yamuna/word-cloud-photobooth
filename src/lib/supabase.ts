@@ -1,10 +1,10 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+  throw new Error("Missing Supabase environment variables");
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
@@ -18,7 +18,7 @@ export const uploadImage = async (
   const { data, error } = await supabase.storage
     .from(bucket)
     .upload(path, file, {
-      cacheControl: '3600',
+      cacheControl: "3600",
       upsert: false,
     });
 
@@ -36,8 +36,8 @@ export const uploadImage = async (
 
 // Helper function to convert base64 to blob
 export const base64ToBlob = (base64: string): Blob => {
-  const parts = base64.split(';base64,');
-  const contentType = parts[0].split(':')[1];
+  const parts = base64.split(";base64,");
+  const contentType = parts[0].split(":")[1];
   const raw = window.atob(parts[1]);
   const rawLength = raw.length;
   const uInt8Array = new Uint8Array(rawLength);

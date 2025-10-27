@@ -25,15 +25,15 @@ function ResultScreen({ words, cameraPhoto, threshold, onHome }: ResultScreenPro
     setError('');
 
     try {
-      // Prepare payload exactly like the HTML file
+      // Prepare payload for detailed portrait word cloud
       const payload = {
         image: cameraPhoto,
         text: words.join(' '),
         threshold: threshold.toString(),
       };
 
-      // Make request to the same endpoint as HTML file
-      const response = await fetch('https://word-cloud-exvir.ondigitalocean.app/generate', {
+      // Make request to local backend
+      const response = await fetch('http://127.0.0.1:5001/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

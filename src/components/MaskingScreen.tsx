@@ -165,31 +165,36 @@ function MaskingScreen({ cameraPhoto, words, onNext }: MaskingScreenProps) {
                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#FFCD11]"
               />
             </div>
-            <div className="flex justify-center gap-4">
-              <button
-                onClick={() => setDrawingMode(drawingMode === 'brush' ? null : 'brush')}
-                className={`px-6 py-3 rounded-lg hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 font-semibold ${
-                  drawingMode === 'brush' ? 'bg-gray-900 text-white' : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                <Paintbrush className="w-5 h-5" />
-                Brush
-              </button>
-              <button
-                onClick={() => setDrawingMode(drawingMode === 'eraser' ? null : 'eraser')}
-                className={`px-6 py-3 rounded-lg hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 font-semibold ${
-                  drawingMode === 'eraser' ? 'bg-gray-900 text-white' : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                <Eraser className="w-5 h-5" />
-                Eraser
-              </button>
-              <button
-                onClick={handleNext}
-                className="px-8 py-3 bg-[#FFCD11] hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 font-semibold"
-              >
-                <ArrowRight className="w-5 h-5" />
-              </button>
+            <div className="flex justify-between items-center">
+              <div className="flex-1"></div>
+              <div className="flex gap-4 justify-center flex-1">
+                <button
+                  onClick={() => setDrawingMode(drawingMode === 'brush' ? null : 'brush')}
+                  className={`px-12 text-2xl py-3 transform hover:scale-105 transition-all flex items-center gap-2 font-semibold ${
+                    drawingMode === 'brush' ? 'bg-[#FFCD11] text-black' : 'bg-black text-[#FFCD11] border-2 border-[#FFCD11]'
+                  }`}
+                >
+
+                  Brush
+                </button>
+                <button
+                  onClick={() => setDrawingMode(drawingMode === 'eraser' ? null : 'eraser')}
+                  className={`px-12 text-2xl py-3 hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 font-semibold ${
+                    drawingMode === 'eraser' ? 'bg-[#FFCD11] text-black' : 'bg-black text-[#FFCD11] border-2 border-[#FFCD11]'
+                  }`}
+                >
+
+                  Eraser
+                </button>
+              </div>
+              <div className="flex-1 flex justify-end">
+                <button
+                  onClick={handleNext}
+                  className="px-12 py-3 bg-[#FFCD11] mr-24 hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 font-semibold"
+                >
+                  <ArrowRight className="w-12 h-8" />
+                </button>
+              </div>
             </div>
           </div>
         </div>

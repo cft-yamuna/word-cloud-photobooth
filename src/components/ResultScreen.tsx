@@ -1,5 +1,5 @@
 import { Home, Printer } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 interface ResultScreenProps {
   words: string[];
@@ -12,9 +12,14 @@ function ResultScreen({ words, cameraPhoto, threshold, onHome }: ResultScreenPro
   const [resultImage, setResultImage] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const hasCalledRef = useRef(false);
 
   useEffect(() => {
-    generateWordCloud();
+    // Prevent duplicate calls in React Strict Mode using ref
+    if (!hasCalledRef.current) {
+      hasCalledRef.current = true;
+      generateWordCloud();
+    }
   }, []);
 
   const generateWordCloud = async () => {

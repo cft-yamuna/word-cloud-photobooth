@@ -11,6 +11,7 @@ function MaskingScreen({ cameraPhoto, words, onNext }: MaskingScreenProps) {
   const [threshold, setThreshold] = useState(128);
   const [drawingMode, setDrawingMode] = useState<'brush' | 'eraser' | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
+  const pixelSize = 0.3; // Fixed small pixel size for smooth masking
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const lastPosRef = useRef<{ x: number; y: number } | null>(null);
@@ -45,21 +46,42 @@ function MaskingScreen({ cameraPhoto, words, onNext }: MaskingScreenProps) {
     canvas.width = 600;
     canvas.height = 600 / aspectRatio;
 
-    // Draw the original image
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    // Draw the original image at reduced size for pixelation
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    if (!tempCtx) return;
 
-    // Apply black & white threshold effect
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
+    // Calculate pixelated dimensions
+    const pixelatedWidth = Math.floor(canvas.width / pixelSize);
+    const pixelatedHeight = Math.floor(canvas.height / pixelSize);
 
+    tempCanvas.width = pixelatedWidth;
+    tempCanvas.height = pixelatedHeight;
+
+    // Draw image small
+    tempCtx.drawImage(img, 0, 0, pixelatedWidth, pixelatedHeight);
+
+    // Get pixelated image data
+    const pixelatedData = tempCtx.getImageData(0, 0, pixelatedWidth, pixelatedHeight);
+    const data = pixelatedData.data;
+
+    // Apply threshold to pixelated data
     for (let i = 0; i < data.length; i += 4) {
-      // Calculate brightness using the same formula as HTML
       const brightness = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
       const color = brightness < threshold ? 0 : 255;
       data[i] = data[i + 1] = data[i + 2] = color;
     }
 
-    ctx.putImageData(imageData, 0, 0);
+    tempCtx.putImageData(pixelatedData, 0, 0);
+
+    // Disable image smoothing for blocky pixels
+    ctx.imageSmoothingEnabled = false;
+    (ctx as any).mozImageSmoothingEnabled = false;
+    (ctx as any).webkitImageSmoothingEnabled = false;
+    (ctx as any).msImageSmoothingEnabled = false;
+
+    // Scale back up to create large pixel effect
+    ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
   };
 
   const handleNext = () => {

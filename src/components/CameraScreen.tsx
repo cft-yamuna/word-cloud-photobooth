@@ -24,7 +24,7 @@ function CameraScreen({ onCapture }: CameraScreenProps) {
   const startCamera = async () => {
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: { ideal: 960 }, height: { ideal: 1280 }, aspectRatio: 0.75 },
+        video: { facingMode: 'user', width: { ideal: 1200 }, height: { ideal: 1800 }, aspectRatio: 0.6667 },
       });
       setStream(mediaStream);
       if (videoRef.current) {
@@ -51,8 +51,8 @@ function CameraScreen({ onCapture }: CameraScreenProps) {
       const videoWidth = video.videoWidth;
       const videoHeight = video.videoHeight;
 
-      // Calculate 3:4 aspect ratio crop
-      const targetAspectRatio = 3 / 4;
+      // Calculate 4:6 (2:3) aspect ratio crop
+      const targetAspectRatio = 2 / 3;
       const videoAspectRatio = videoWidth / videoHeight;
 
       let sourceWidth, sourceHeight, sourceX, sourceY;
@@ -71,9 +71,9 @@ function CameraScreen({ onCapture }: CameraScreenProps) {
         sourceY = (videoHeight - sourceHeight) / 2;
       }
 
-      // Set canvas to 3:4 aspect ratio with good quality
-      canvas.width = 960;
-      canvas.height = 1280;
+      // Set canvas to 4:6 (2:3) aspect ratio with good quality
+      canvas.width = 1200;
+      canvas.height = 1800;
 
       const ctx = canvas.getContext('2d');
       if (ctx) {
@@ -133,7 +133,7 @@ function CameraScreen({ onCapture }: CameraScreenProps) {
             </div>
           )}
 
-          <div className="relative bg-black rounded-xl overflow-hidden mb-6" style={{ aspectRatio: '3/4' }}>
+          <div className="relative bg-black rounded-xl overflow-hidden mb-6" style={{ aspectRatio: '2/3' }}>
             {!capturedPhoto ? (
               <video
                 ref={videoRef}

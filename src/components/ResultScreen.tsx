@@ -1,6 +1,5 @@
-import { Home, Download } from 'lucide-react';
+import { Home, Printer } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import QRCode from './QRCode';
 import { uploadImage } from '../lib/supabase';
 
 interface ResultScreenProps {
@@ -73,12 +72,56 @@ function ResultScreen({ words, cameraPhoto, threshold, onHome }: ResultScreenPro
     }
   };
 
-  const handleDownload = () => {
+  const handlePrint = () => {
     if (!resultImage) return;
-    const link = document.createElement('a');
-    link.download = 'threshold-word-cloud.png';
-    link.href = resultImage;
-    link.click();
+
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Print Word Cloud</title>
+            <style>
+              body {
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+              }
+              img {
+                max-width: 100%;
+                height: auto;
+              }
+              @media print {
+                body {
+                  margin: 0;
+                }
+                img {
+                  width: 4in;
+                  height: 6in;
+                  object-fit: contain;
+                }
+              }
+            </style>
+          </head>
+          <body>
+            <img src="${resultImage}" alt="Word Cloud" />
+            <script>
+              window.onload = function() {
+                window.print();
+                window.onafterprint = function() {
+                  window.close();
+                };
+              };
+            </script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
   };
 
   return (
@@ -118,12 +161,16 @@ function ResultScreen({ words, cameraPhoto, threshold, onHome }: ResultScreenPro
             </>
           )}
 
-          {/* QR Code and Home Button Row */}
-          <div className="flex items-center justify-center gap-8">
-            {outputUrl && (
-              <div className="bg-gray-50 rounded-xl p-4">
-                <QRCode value={`${outputUrl}${outputUrl.includes('?') ? '&' : '?'}download=wordcloud`} size={150} />
-              </div>
+          {/* Action Buttons Row */}
+          <div className="flex items-center justify-center gap-4">
+            {resultImage && (
+              <button
+                onClick={handlePrint}
+                className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 font-semibold"
+              >
+                <Printer className="w-5 h-5" />
+                Print
+              </button>
             )}
             <button
               onClick={onHome}

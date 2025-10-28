@@ -42,7 +42,7 @@ function CameraScreen({ onCapture }: CameraScreenProps) {
     }
   };
 
-  const handleTakePhoto = () => {
+ const handleTakePhoto = async () => {
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
       const canvas = canvasRef.current;
@@ -84,7 +84,29 @@ function CameraScreen({ onCapture }: CameraScreenProps) {
           0, 0, canvas.width, canvas.height
         );
         const photoData = canvas.toDataURL('image/png');
-        setCapturedPhoto(photoData);
+        
+        // Directly upload without preview
+        setUploading(true);
+        setError('');
+
+        try {
+          // Convert base64 to blob
+          const blob = base64ToBlob(photoData);
+
+          // Generate unique filename
+          const timestamp = Date.now();
+          const filename = `input_${timestamp}.png`;
+
+          // Upload to Supabase storage
+          await uploadImage('wordcloud', `input/${filename}`, blob);
+
+          stopCamera();
+          onCapture(photoData);
+        } catch (err) {
+          console.error('Error uploading image:', err);
+          setError(err instanceof Error ? err.message : 'Failed to upload image');
+          setUploading(false);
+        }
       }
     }
   };
@@ -120,7 +142,7 @@ function CameraScreen({ onCapture }: CameraScreenProps) {
   };
 
   return (
-    <div className="min-h-screen p-8 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/bg2.png)' }}>
+    <div className="min-h-screen p-8 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/bg5.png)' }}>
       <div className="max-w-4xl mx-auto mt-[22rem]">
         <div className=" p-2">
           {error && (
@@ -129,7 +151,7 @@ function CameraScreen({ onCapture }: CameraScreenProps) {
             </div>
           )}
 
-          <div className="relative bg-black  overflow-hidden mb-6" style={{ aspectRatio: '2/3' }}>
+          <div className="relative bg-black  overflow-hidden mb-6" style={{ aspectRatio: '5/3' }}>
             {!capturedPhoto ? (
               <video
                 ref={videoRef}

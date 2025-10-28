@@ -8,7 +8,7 @@ function StartScreen({ onStart }: StartScreenProps) {
       className="min-h-screen flex items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: 'url(/bg1.png)' }}
     >
-      <div className="text-center">
+      <div className="text-center mt-[501px] ml-[-1181px]">
         <button
           onClick={onStart}
           className="px-24 py-3 bg-[#FFCD11] text-black text-4xl font-semibold  hover:shadow-xl transform hover:scale-105 transition-all duration-200 mr-[38rem]"

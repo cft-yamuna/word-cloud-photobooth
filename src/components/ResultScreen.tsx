@@ -135,7 +135,7 @@ function ResultScreen({ words, cameraPhoto, threshold, onHome }: ResultScreenPro
   };
 
   return (
-    <div className="min-h-screen p-8 flex items-center justify-center bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/bg4.png)' }}>
+    <div className="min-h-screen p-8 flex items-center justify-center bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/bg5.png)' }}>
       <div className="max-w-4xl w-full">
         <div className="mt-64 p-8">
           {/* Output Image - Large Display */}

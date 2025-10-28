@@ -153,7 +153,7 @@ function MaskingScreen({ cameraPhoto, words, onNext }: MaskingScreenProps) {
   };
 
   return (
-    <div className="min-h-screen p-8 flex items-center justify-center bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/bg3.png)' }}>
+    <div className="min-h-screen p-8 flex items-center justify-center bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/bg5.png)' }}>
       <div className="max-w-6xl w-full">
         <div className="mt-52 p-4">
 

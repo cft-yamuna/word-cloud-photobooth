@@ -112,7 +112,7 @@ function CameraScreen({ onCapture }: CameraScreenProps) {
             </div>
           )}
 
-          <div className="relative bg-black  overflow-hidden mb-6" style={{ aspectRatio: '5/3' }}>
+          <div className="relative bg-black overflow-hidden mb-6 mx-auto" style={{ aspectRatio: '2/3', maxWidth: '600px' }}>
             <video
               ref={videoRef}
               autoPlay

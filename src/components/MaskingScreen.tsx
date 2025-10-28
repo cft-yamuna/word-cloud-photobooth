@@ -42,9 +42,9 @@ function MaskingScreen({ cameraPhoto, words, onNext }: MaskingScreenProps) {
     const img = imageRef.current;
     const aspectRatio = img.width / img.height;
 
-    // Set canvas dimensions
-    canvas.width = 600;
-    canvas.height = 600 / aspectRatio;
+    // Set canvas dimensions to 400px for faster backend processing
+    canvas.width = 400;
+    canvas.height = 400 / aspectRatio;
 
     // Draw the original image at reduced size for pixelation
     const tempCanvas = document.createElement('canvas');

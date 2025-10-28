@@ -1,6 +1,5 @@
 import { Home, Printer } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { uploadImage } from '../lib/supabase';
 
 interface ResultScreenProps {
   words: string[];
@@ -13,7 +12,6 @@ function ResultScreen({ words, cameraPhoto, threshold, onHome }: ResultScreenPro
   const [resultImage, setResultImage] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [outputUrl, setOutputUrl] = useState<string>('');
 
   useEffect(() => {
     generateWordCloud();
@@ -52,18 +50,6 @@ function ResultScreen({ words, cameraPhoto, threshold, onHome }: ResultScreenPro
       const imageUrl = URL.createObjectURL(imageBlob);
 
       setResultImage(imageUrl);
-
-      // Upload to Supabase storage
-      try {
-        const timestamp = Date.now();
-        const filename = `output_${timestamp}.png`;
-        const publicUrl = await uploadImage('wordcloud', `output/${filename}`, imageBlob);
-        setOutputUrl(publicUrl);
-        console.log('Word cloud uploaded to Supabase successfully');
-      } catch (uploadErr) {
-        console.error('Error uploading to Supabase:', uploadErr);
-        // Don't fail the entire operation if upload fails
-      }
     } catch (err) {
       console.error('Error generating word cloud:', err);
       setError(err instanceof Error ? err.message : 'Failed to generate word cloud');

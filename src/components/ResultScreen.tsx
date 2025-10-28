@@ -125,16 +125,14 @@ function ResultScreen({ words, cameraPhoto, threshold, onHome }: ResultScreenPro
   };
 
   return (
-    <div className="min-h-screen p-8 flex items-center justify-center">
+    <div className="min-h-screen p-8 flex items-center justify-center bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/bg4.png)' }}>
       <div className="max-w-4xl w-full">
-        <h2 className="text-4xl font-bold text-center mb-8 text-gray-800">Your Word Cloud</h2>
-
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="mt-64 p-8">
           {/* Output Image - Large Display */}
           {loading ? (
-            <div className="flex items-center justify-center h-96 bg-gray-50 rounded-xl mb-6">
+            <div className="flex items-center justify-center h-96 mb-6">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-500 mx-auto mb-4"></div>
+                <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#FFCD11] mx-auto mb-4"></div>
                 <p className="text-gray-600">Generating your word cloud...</p>
               </div>
             </div>
@@ -146,11 +144,11 @@ function ResultScreen({ words, cameraPhoto, threshold, onHome }: ResultScreenPro
                 </div>
               )}
               {resultImage ? (
-                <div className="bg-gray-50 rounded-xl p-4 mb-6">
+                <div className=" p-4 mb-6">
                   <img
                     src={resultImage}
                     alt="Word Cloud"
-                    className="w-full h-auto rounded-lg shadow-md"
+                    className="w-full h-auto "
                   />
                 </div>
               ) : !error && (
@@ -162,24 +160,23 @@ function ResultScreen({ words, cameraPhoto, threshold, onHome }: ResultScreenPro
           )}
 
           {/* Action Buttons Row */}
-          <div className="flex items-center justify-center gap-4">
-            {resultImage && (
+          {!loading && resultImage && (
+            <div className="flex items-center justify-center gap-4">
               <button
                 onClick={handlePrint}
-                className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 font-semibold"
+                className="px-12 py-3 bg-black text-[#FFCD11] border-2 border-[#FFCD11] text-2xl hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 font-semibold"
               >
-                <Printer className="w-5 h-5" />
+
                 Print
               </button>
-            )}
-            <button
-              onClick={onHome}
-              className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 font-semibold"
-            >
-              <Home className="w-5 h-5" />
-              Home
-            </button>
-          </div>
+              <button
+                onClick={onHome}
+                className="px-12 text-2xl py-3 bg-[#FFCD11] text-black hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 font-semibold"
+              >
+                Home
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

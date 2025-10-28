@@ -120,20 +120,16 @@ function CameraScreen({ onCapture }: CameraScreenProps) {
   };
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-4xl font-bold text-center mb-8 text-gray-800">
-          Capture Photo
-        </h2>
-
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+    <div className="min-h-screen p-8 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/bg2.png)' }}>
+      <div className="max-w-4xl mx-auto mt-[22rem]">
+        <div className=" p-2">
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
               {error}
             </div>
           )}
 
-          <div className="relative bg-black rounded-xl overflow-hidden mb-6" style={{ aspectRatio: '2/3' }}>
+          <div className="relative bg-black  overflow-hidden mb-6" style={{ aspectRatio: '2/3' }}>
             {!capturedPhoto ? (
               <video
                 ref={videoRef}
@@ -158,26 +154,25 @@ function CameraScreen({ onCapture }: CameraScreenProps) {
               <button
                 onClick={handleTakePhoto}
                 disabled={!!error}
-                className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:shadow-lg transform hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-2 font-semibold"
+                className="px-20 py-3 mr-[38rem] bg-[#FFCD11] text-4xl hover:shadow-lg transform hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-2 font-semibold"
               >
-                <Camera className="w-5 h-5" />
-                Take Photo
+                Capture
               </button>
             ) : (
               <>
                 <button
                   onClick={handleRetake}
-                  className="px-8 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors flex items-center gap-2 font-semibold"
+                  className="px-8 py-3 bg-white  hover:bg-gray-300 transition-colors flex items-center gap-2 font-semibold"
                 >
-                  <RotateCcw className="w-5 h-5" />
+                  
                   Retake
                 </button>
                 <button
                   onClick={handleConfirm}
                   disabled={uploading}
-                  className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="px-8 py-3 bg-[#FFCD11] text  hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
-                  <Check className="w-5 h-5" />
+                  
                   {uploading ? 'Uploading...' : 'Confirm'}
                 </button>
               </>

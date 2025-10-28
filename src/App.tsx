@@ -17,6 +17,7 @@ const FIXED_WORDS = [
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('start');
   const [cameraPhoto, setCameraPhoto] = useState<string>('');
+  const [maskedPhoto, setMaskedPhoto] = useState<string>('');
   const [threshold, setThreshold] = useState<number>(128);
 
   const handleStart = () => {
@@ -28,13 +29,15 @@ function App() {
     setCurrentScreen('masking');
   };
 
-  const handleMaskingComplete = (selectedThreshold: number) => {
+  const handleMaskingComplete = (selectedThreshold: number, masked: string) => {
     setThreshold(selectedThreshold);
+    setMaskedPhoto(masked);
     setCurrentScreen('result');
   };
 
   const handleHome = () => {
     setCameraPhoto('');
+    setMaskedPhoto('');
     setThreshold(128);
     setCurrentScreen('start');
   };
@@ -53,7 +56,7 @@ function App() {
       {currentScreen === 'result' && (
         <ResultScreen
           words={FIXED_WORDS}
-          cameraPhoto={cameraPhoto}
+          cameraPhoto={maskedPhoto || cameraPhoto}
           threshold={threshold}
           onHome={handleHome}
         />

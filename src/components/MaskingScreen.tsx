@@ -1,16 +1,19 @@
 import { useRef, useEffect, useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Paintbrush, Eraser } from 'lucide-react';
 
 interface MaskingScreenProps {
   cameraPhoto: string;
   words: string[];
-  onNext: (threshold: number) => void;
+  onNext: (threshold: number, maskedPhoto: string) => void;
 }
 
 function MaskingScreen({ cameraPhoto, words, onNext }: MaskingScreenProps) {
   const [threshold, setThreshold] = useState(128);
+  const [drawingMode, setDrawingMode] = useState<'brush' | 'eraser' | null>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
+  const lastPosRef = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     // Load the camera photo
@@ -60,38 +63,97 @@ function MaskingScreen({ cameraPhoto, words, onNext }: MaskingScreenProps) {
   };
 
   const handleNext = () => {
-    onNext(threshold);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // Capture the canvas image with all the brush/eraser edits
+    const maskedPhoto = canvas.toDataURL('image/png');
+    onNext(threshold, maskedPhoto);
+  };
+
+  const getCanvasCoordinates = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
+    };
+  };
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!drawingMode) return;
+    setIsDrawing(true);
+    const coords = getCanvasCoordinates(e);
+    if (coords) {
+      lastPosRef.current = coords;
+      draw(e);
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDrawing || !drawingMode) return;
+    draw(e);
+  };
+
+  const handleMouseUp = () => {
+    setIsDrawing(false);
+    lastPosRef.current = null;
+  };
+
+  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const coords = getCanvasCoordinates(e);
+    if (!coords) return;
+
+    ctx.strokeStyle = drawingMode === 'brush' ? '#000000' : '#FFFFFF';
+    ctx.lineWidth = 30;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    if (lastPosRef.current) {
+      ctx.beginPath();
+      ctx.moveTo(lastPosRef.current.x, lastPosRef.current.y);
+      ctx.lineTo(coords.x, coords.y);
+      ctx.stroke();
+    }
+
+    lastPosRef.current = coords;
   };
 
   return (
-    <div className="min-h-screen p-8 flex items-center justify-center">
-      <div className="max-w-3xl w-full">
-        <h2 className="text-4xl font-bold text-center mb-8 text-gray-800">
-          Adjust Your Mask
-        </h2>
+    <div className="min-h-screen p-8 flex items-center justify-center bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/bg3.png)' }}>
+      <div className="max-w-6xl w-full">
+        <div className="mt-52 p-4">
 
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          {/* Display the words that will be used */}
-          <div className="mb-4 p-4 bg-blue-50 rounded-lg">
-            <p className="text-sm font-semibold text-gray-700 mb-2">Words that will be used:</p>
-            <p className="text-xs text-gray-600 leading-relaxed">
-              {words.join(' • ')}
-            </p>
-          </div>
 
           {/* Mask Preview - Centered */}
-          <div className="flex items-center justify-center bg-gray-50 rounded-xl p-6 mb-6">
+          <div className="flex items-center justify-center p-6 ">
             <canvas
               ref={canvasRef}
-              className="max-w-full rounded-lg border border-gray-200 shadow-md"
+              className="w-full"
+              style={{ maxWidth: '800px', cursor: drawingMode ? 'crosshair' : 'default' }}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
             />
           </div>
 
-          {/* Controls - Small Row Below */}
-          <div className="flex items-center gap-4">
-            <div className="flex-1">
+          {/* Controls */}
+          <div>
+            <div className="mb-4 mx-24">
               <label htmlFor="threshold" className="block mb-2 text-sm font-medium">
-                Threshold: <span className="text-blue-600">{threshold}</span>
+                Threshold: <span className="text-[#FFCD11]">{threshold}</span>
               </label>
               <input
                 type="range"
@@ -100,16 +162,35 @@ function MaskingScreen({ cameraPhoto, words, onNext }: MaskingScreenProps) {
                 max="255"
                 value={threshold}
                 onChange={(e) => setThreshold(parseInt(e.target.value, 10))}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#FFCD11]"
               />
             </div>
-            <button
-              onClick={handleNext}
-              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 font-semibold whitespace-nowrap"
-            >
-              Generate
-              <ArrowRight className="w-5 h-5" />
-            </button>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => setDrawingMode(drawingMode === 'brush' ? null : 'brush')}
+                className={`px-6 py-3 rounded-lg hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 font-semibold ${
+                  drawingMode === 'brush' ? 'bg-gray-900 text-white' : 'bg-gray-200 text-gray-700'
+                }`}
+              >
+                <Paintbrush className="w-5 h-5" />
+                Brush
+              </button>
+              <button
+                onClick={() => setDrawingMode(drawingMode === 'eraser' ? null : 'eraser')}
+                className={`px-6 py-3 rounded-lg hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 font-semibold ${
+                  drawingMode === 'eraser' ? 'bg-gray-900 text-white' : 'bg-gray-200 text-gray-700'
+                }`}
+              >
+                <Eraser className="w-5 h-5" />
+                Eraser
+              </button>
+              <button
+                onClick={handleNext}
+                className="px-8 py-3 bg-[#FFCD11] hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 font-semibold"
+              >
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
       </div>

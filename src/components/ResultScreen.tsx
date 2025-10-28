@@ -32,7 +32,7 @@ function ResultScreen({ words, cameraPhoto, threshold, onHome }: ResultScreenPro
       };
 
       // Make request to local backend
-      const response = await fetch('https://word-cloud-exvir.ondigitalocean.app/generate', {
+      const response = await fetch('http://127.0.0.1:5000/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

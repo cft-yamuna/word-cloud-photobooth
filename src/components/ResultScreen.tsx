@@ -75,53 +75,63 @@ function ResultScreen({ words, cameraPhoto, threshold, onHome }: ResultScreenPro
   const handlePrint = () => {
     if (!resultImage) return;
 
-    // Create a new window for printing
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>Print Word Cloud</title>
-            <style>
+    // Create a hidden iframe for printing
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = 'none';
+
+    document.body.appendChild(iframe);
+
+    const iframeDoc = iframe.contentWindow?.document;
+    if (!iframeDoc) return;
+
+    iframeDoc.open();
+    iframeDoc.write(`
+      <html>
+        <head>
+          <title>Print Word Cloud</title>
+          <style>
+            @media print {
+              @page {
+                size: 4in 6in;
+                margin: 0;
+              }
               body {
                 margin: 0;
                 padding: 0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
               }
               img {
-                max-width: 100%;
-                height: auto;
+                width: 4in;
+                height: 6in;
+                object-fit: contain;
+                display: block;
               }
-              @media print {
-                body {
-                  margin: 0;
-                }
-                img {
-                  width: 4in;
-                  height: 6in;
-                  object-fit: contain;
-                }
-              }
-            </style>
-          </head>
-          <body>
-            <img src="${resultImage}" alt="Word Cloud" />
-            <script>
-              window.onload = function() {
-                window.print();
-                window.onafterprint = function() {
-                  window.close();
-                };
-              };
-            </script>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-    }
+            }
+          </style>
+        </head>
+        <body>
+          <img src="${resultImage}" alt="Word Cloud" />
+        </body>
+      </html>
+    `);
+    iframeDoc.close();
+
+    // Wait for image to load then print
+    iframe.onload = () => {
+      setTimeout(() => {
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+
+        // Remove iframe after printing
+        setTimeout(() => {
+          document.body.removeChild(iframe);
+        }, 1000);
+      }, 250);
+    };
   };
 
   return (

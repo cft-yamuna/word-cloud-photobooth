@@ -1,6 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
 import { Camera, RotateCcw, Check } from 'lucide-react';
-import { uploadImage, base64ToBlob } from '../lib/supabase';
 
 interface CameraScreenProps {
   onCapture: (photo: string) => void;
@@ -10,9 +9,8 @@ function CameraScreen({ onCapture }: CameraScreenProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const [capturedPhoto, setCapturedPhoto] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const [uploading, setUploading] = useState(false);
+  const [isVideoReady, setIsVideoReady] = useState(false);
 
   useEffect(() => {
     startCamera();
@@ -29,6 +27,10 @@ function CameraScreen({ onCapture }: CameraScreenProps) {
       setStream(mediaStream);
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
+        // Wait for video to be ready
+        videoRef.current.onloadedmetadata = () => {
+          setIsVideoReady(true);
+        };
       }
     } catch (err) {
       setError('Could not access camera. Please allow camera access.');
@@ -42,14 +44,20 @@ function CameraScreen({ onCapture }: CameraScreenProps) {
     }
   };
 
- const handleTakePhoto = async () => {
-    if (videoRef.current && canvasRef.current) {
+  const handleTakePhoto = () => {
+    if (videoRef.current && canvasRef.current && isVideoReady) {
       const video = videoRef.current;
       const canvas = canvasRef.current;
 
       // Get video dimensions
       const videoWidth = video.videoWidth;
       const videoHeight = video.videoHeight;
+
+      // Check if video dimensions are valid
+      if (videoWidth === 0 || videoHeight === 0) {
+        setError('Video not ready. Please try again.');
+        return;
+      }
 
       // Calculate 4:6 (2:3) aspect ratio crop
       const targetAspectRatio = 2 / 3;
@@ -85,61 +93,14 @@ function CameraScreen({ onCapture }: CameraScreenProps) {
         );
         const photoData = canvas.toDataURL('image/png');
         
-        // Directly upload without preview
-        setUploading(true);
-        setError('');
-
-        try {
-          // Convert base64 to blob
-          const blob = base64ToBlob(photoData);
-
-          // Generate unique filename
-          const timestamp = Date.now();
-          const filename = `input_${timestamp}.png`;
-
-          // Upload to Supabase storage
-          await uploadImage('wordcloud', `input/${filename}`, blob);
-
-          stopCamera();
-          onCapture(photoData);
-        } catch (err) {
-          console.error('Error uploading image:', err);
-          setError(err instanceof Error ? err.message : 'Failed to upload image');
-          setUploading(false);
-        }
-      }
-    }
-  };
-
-  const handleRetake = () => {
-    setCapturedPhoto('');
-  };
-
-  const handleConfirm = async () => {
-    if (capturedPhoto) {
-      setUploading(true);
-      setError('');
-
-      try {
-        // Convert base64 to blob
-        const blob = base64ToBlob(capturedPhoto);
-
-        // Generate unique filename
-        const timestamp = Date.now();
-        const filename = `input_${timestamp}.png`;
-
-        // Upload to Supabase storage
-        await uploadImage('wordcloud', `input/${filename}`, blob);
-
+        // Directly go to next screen with photo data
         stopCamera();
-        onCapture(capturedPhoto);
-      } catch (err) {
-        console.error('Error uploading image:', err);
-        setError(err instanceof Error ? err.message : 'Failed to upload image');
-        setUploading(false);
+        onCapture(photoData);
       }
     }
   };
+
+
 
   return (
     <div className="min-h-screen p-8 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/bg5.png)' }}>
@@ -152,53 +113,25 @@ function CameraScreen({ onCapture }: CameraScreenProps) {
           )}
 
           <div className="relative bg-black  overflow-hidden mb-6" style={{ aspectRatio: '5/3' }}>
-            {!capturedPhoto ? (
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <img
-                src={capturedPhoto}
-                alt="Captured"
-                className="w-full h-full object-cover"
-              />
-            )}
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className="w-full h-full object-cover"
+            />
           </div>
 
           <canvas ref={canvasRef} className="hidden" />
 
           <div className="flex justify-center gap-4">
-            {!capturedPhoto ? (
-              <button
-                onClick={handleTakePhoto}
-                disabled={!!error}
-                className="px-20 py-3 mr-[38rem] bg-[#FFCD11] text-4xl hover:shadow-lg transform hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-2 font-semibold"
-              >
-                Capture
-              </button>
-            ) : (
-              <>
-                <button
-                  onClick={handleRetake}
-                  className="px-8 py-3 bg-white  hover:bg-gray-300 transition-colors flex items-center gap-2 font-semibold"
-                >
-                  
-                  Retake
-                </button>
-                <button
-                  onClick={handleConfirm}
-                  disabled={uploading}
-                  className="px-8 py-3 bg-[#FFCD11] text  hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                >
-                  
-                  {uploading ? 'Uploading...' : 'Confirm'}
-                </button>
-              </>
-            )}
+            <button
+              onClick={handleTakePhoto}
+              disabled={!!error || !isVideoReady}
+              className="px-20 py-3 mr-[38rem] bg-[#FFCD11] text-4xl hover:shadow-lg transform hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-2 font-semibold"
+            >
+              {!isVideoReady ? 'Loading...' : 'Capture'}
+            </button>
           </div>
         </div>
       </div>
